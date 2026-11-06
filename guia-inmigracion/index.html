@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Inmigración</title>
+<meta name="description" content="Chatbot de ayuda para inmigrantes y refugiados en España. Información sobre NIE, TIE, permisos de trabajo, sanidad y más.">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3250;
+    --text: #e8eaf6;
+    --text2: #9095b0;
+    --accent: #5c6bc0;
+    --accent2: #7986cb;
+    --accent-light: rgba(92,107,192,0.15);
+    --user-bg: #3949ab;
+    --bot-bg: #1a1d27;
+    --btn: #2e3250;
+    --btn-hover: #3a4070;
+    --shadow: 0 4px 24px rgba(0,0,0,0.5);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --success: #4caf50;
+    --warn: #ff9800;
+  }
+  [data-theme="light"] {
+    --bg: #f0f2ff;
+    --surface: #fff;
+    --surface2: #e8ebff;
+    --border: #c5cae9;
+    --text: #1a237e;
+    --text2: #5c6bc0;
+    --accent: #3f51b5;
+    --accent2: #5c6bc0;
+    --accent-light: rgba(63,81,181,0.1);
+    --user-bg: #3f51b5;
+    --bot-bg: #fff;
+    --btn: #e8ebff;
+    --btn-hover: #d8ddff;
+    --shadow: 0 4px 24px rgba(63,81,181,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo svg{width:32px;height:32px;flex-shrink:0}
+  .logo-text h1{font-size:1rem;font-weight:700;color:var(--text);line-height:1.2}
+  .logo-text p{font-size:0.7rem;color:var(--text2)}
+  .header-controls{display:flex;align-items:center;gap:8px}
+  .lang-selector{display:flex;gap:4px;background:var(--surface2);border-radius:20px;padding:3px}
+  .lang-btn{border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:16px;transition:all 0.2s}
+  .lang-btn.active{background:var(--accent);color:#fff}
+  .lang-btn:hover:not(.active){background:var(--btn-hover);color:var(--text)}
+  .theme-btn{border:none;background:var(--btn);color:var(--text2);cursor:pointer;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.2s}
+  .theme-btn:hover{background:var(--btn-hover);color:var(--text)}
+  .chat-wrap{flex:1;display:flex;flex-direction:column;max-width:720px;margin:0 auto;width:100%;padding:16px 12px 0}
+  .messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-bottom:16px}
+  .messages::-webkit-scrollbar{width:4px}
+  .messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+  .msg{max-width:88%;display:flex;flex-direction:column;gap:4px}
+  .msg.user{align-self:flex-end;align-items:flex-end}
+  .msg.bot{align-self:flex-start;align-items:flex-start}
+  .bubble{padding:12px 16px;border-radius:var(--radius);line-height:1.6;font-size:0.92rem}
+  .msg.user .bubble{background:var(--user-bg);color:#fff;border-bottom-right-radius:4px}
+  .msg.bot .bubble{background:var(--bot-bg);border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:var(--shadow)}
+  .bubble b{font-weight:700}
+  .bubble ul{margin:8px 0 4px 18px;display:flex;flex-direction:column;gap:3px}
+  .bubble a{color:var(--accent2);text-decoration:none;border-bottom:1px solid transparent;transition:border-color 0.2s}
+  .bubble a:hover{border-bottom-color:var(--accent2)}
+  .bubble .tag{display:inline-block;background:var(--accent-light);color:var(--accent2);font-size:0.72rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+  .quick-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .qbtn{border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:0.82rem;padding:7px 14px;border-radius:20px;transition:all 0.2s;text-align:left}
+  .qbtn:hover{background:var(--accent-light);border-color:var(--accent2);color:var(--accent2)}
+  .qbtn.cat{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;padding:10px 18px;font-size:0.88rem}
+  .qbtn.cat:hover{background:var(--accent2);border-color:var(--accent2)}
+  .card-links{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .card-link{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--btn);border-radius:var(--radius-sm);color:var(--text);text-decoration:none;font-size:0.85rem;transition:all 0.2s;border:1px solid transparent}
+  .card-link:hover{background:var(--accent-light);border-color:var(--accent2);color:var(--accent2)}
+  .card-link svg{width:16px;height:16px;flex-shrink:0}
+  .input-area{background:var(--surface);border-top:1px solid var(--border);padding:12px;position:sticky;bottom:0}
+  .input-wrap{max-width:720px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+  .input-box{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;color:var(--text);font-size:0.92rem;font-family:inherit;resize:none;min-height:48px;max-height:140px;line-height:1.5;outline:none;transition:border-color 0.2s}
+  .input-box:focus{border-color:var(--accent)}
+  .input-box::placeholder{color:var(--text2)}
+  .send-btn,.mic-btn{border:none;cursor:pointer;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+  .send-btn{background:var(--accent);color:#fff}
+  .send-btn:hover{background:var(--accent2)}
+  .mic-btn{background:var(--btn);color:var(--text2)}
+  .mic-btn:hover{background:var(--btn-hover);color:var(--text)}
+  .mic-btn.listening{background:#e53935;color:#fff;animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+  .typing{display:none;gap:5px;padding:14px 16px;background:var(--bot-bg);border:1px solid var(--border);border-radius:var(--radius);border-bottom-left-radius:4px;box-shadow:var(--shadow);width:fit-content;align-self:flex-start}
+  .typing.show{display:flex}
+  .dot{width:7px;height:7px;background:var(--text2);border-radius:50%;animation:bounce 1.2s infinite}
+  .dot:nth-child(2){animation-delay:0.2s}
+  .dot:nth-child(3){animation-delay:0.4s}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .welcome{text-align:center;padding:24px 16px 16px}
+  .welcome-icon{font-size:3rem;margin-bottom:12px}
+  .welcome h2{font-size:1.3rem;font-weight:700;margin-bottom:8px}
+  .welcome p{color:var(--text2);font-size:0.9rem;line-height:1.6}
+  .info-footer{text-align:center;font-size:0.7rem;color:var(--text2);padding:8px 0 4px}
+  @media(max-width:480px){.logo-text p{display:none}.msg{max-width:95%}.qbtn.cat{padding:8px 14px;font-size:0.82rem}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="18" fill="#3949ab"/>
+      <path d="M10 26 Q14 12 18 18 Q22 24 26 10" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <circle cx="18" cy="18" r="3" fill="#7986cb"/>
+    </svg>
+    <div class="logo-text">
+      <h1>Guía de Inmigración</h1>
+      <p id="subtitle">Información para inmigrantes en España</p>
+    </div>
+  </div>
+  <div class="header-controls">
+    <div class="lang-selector">
+      <button class="lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
+  </div>
+</header>
+<div class="chat-wrap">
+  <div class="messages" id="messages" role="log" aria-live="polite">
+    <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+</div>
+<div class="input-area">
+  <div class="input-wrap">
+    <textarea class="input-box" id="inputBox" rows="1" placeholder="Escribe tu pregunta..." maxlength="500"></textarea>
+    <button class="mic-btn" id="micBtn" onclick="toggleVoice()">🎤</button>
+    <button class="send-btn" onclick="sendMsg()">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+  <div class="info-footer" id="infoFooter">Guía de Inmigración · gratuito y confidencial · no almacena datos</div>
+</div>
+<script>
+let currentLang = localStorage.getItem('lang') || 'es';
+const UI = {
+  es: {
+    subtitle: 'Información para inmigrantes en España',
+    placeholder: 'Escribe tu pregunta...',
+    footer: 'Guía de Inmigración · gratuito y confidencial · no almacena datos',
+    welcome: '<div class="welcome"><div class="welcome-icon">🧭</div><h2>Bienvenido/a a Guía de Inmigración</h2><p>Estoy aquí para ayudarte con información sobre documentos, trabajo, salud y derechos en España.<br>Escribe tu pregunta o elige una categoría:</p></div>',
+    categories: ['📄 Documentos y permisos', '💼 Trabajo y empleo', '🏥 Salud', '🆘 Ayuda urgente'],
+    catIds: ['papeles', 'trabajo', 'salud', 'ayuda'],
+    unknownPrefix: '🔍 No tengo esa información en mi base de datos, pero puedes buscarla aquí:',
+    unknownGoogle: 'Buscar en Google', unknownIntranet: 'Portal Inmigración (Ministerio)', unknownPAGES: 'Sede Administración Pública',
+    unknownAskMore: 'Puedes reformular la pregunta con más detalles.',
+  },
+  fr: {
+    subtitle: 'Informations pour les immigrants en Espagne',
+    placeholder: 'Écrivez votre question...',
+    footer: 'Guide Immigration · gratuit et confidentiel · aucune donnée stockée',
+    welcome: '<div class="welcome"><div class="welcome-icon">🧭</div><h2>Bienvenue sur le Guide Immigration</h2><p>Je suis ici pour vous aider avec des informations sur les documents, le travail, la santé et les droits en Espagne.<br>Écrivez votre question ou choisissez une catégorie :</p></div>',
+    categories: ['📄 Documents et permis', '💼 Travail et emploi', '🏥 Santé', '🆘 Aide urgente'],
+    catIds: ['papeles', 'trabajo', 'salud', 'ayuda'],
+    unknownPrefix: 'Je n\'ai pas cette information, mais vous pouvez la chercher ici :',
+    unknownGoogle: 'Chercher sur Google', unknownIntranet: 'Portail Immigration (Ministère)', unknownPAGES: 'Siège Administration Publique',
+    unknownAskMore: 'Vous pouvez reformuler la question avec plus de détails.',
+  },
+  en: {
+    subtitle: 'Information for immigrants in Spain',
+    placeholder: 'Type your question...',
+    footer: 'Immigration Guide · free and confidential · no data stored',
+    welcome: '<div class="welcome"><div class="welcome-icon">🧭</div><h2>Welcome to Immigration Guide</h2><p>I am here to help you with information about documents, work, health and rights in Spain.<br>Type your question or choose a category:</p></div>',
+    categories: ['📄 Documents & permits', '💼 Work & employment', '🏥 Health', '🆘 Urgent help'],
+    catIds: ['papeles', 'trabajo', 'salud', 'ayuda'],
+    unknownPrefix: 'I do not have that information, but you can search here:',
+    unknownGoogle: 'Search on Google', unknownIntranet: 'Immigration Portal (Ministry)', unknownPAGES: 'Public Administration Office',
+    unknownAskMore: 'You can rephrase the question with more details.',
+  }
+};
+const DB = {
+  papeles: {
+    es: { title: '📄 Documentos y permisos', intro: 'Información sobre los principales documentos para vivir en España:', subs: {
+      nie: { label: '¿Qué es el NIE?', content: '<div class="tag">Documento</div><b>NIE — Número de Identidad de Extranjero</b><br><br>Es el número fiscal para extranjeros. Necesario para trabajar, abrir cuenta bancaria, alquilar vivienda.<br><b>Formulario EX-15</b> · Coste: ~12€<br><div class="card-links"><a class="card-link" href="https://sede.administracionespublicas.gob.es/icpplus/index.html" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Pedir cita previa</a><a class="card-link" href="https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/15-Formulario_NIE_y_certificados.pdf" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Descargar EX-15 (PDF)</a></div>' },
+      tie: { label: '¿Qué es la TIE?', content: '<div class="tag">Documento</div><b>TIE — Tarjeta de Identidad de Extranjero</b><br><br>Tarjeta física de residencia legal. Formulario EX-17 · Coste: ~16€<br><div class="card-links"><a class="card-link" href="https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/17-Tarjeta_de_identidad_de_extranjero.pdf" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Descargar EX-17 (PDF)</a><a class="card-link" href="https://sede.administracionespublicas.gob.es/icpplus/index.html" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Pedir cita previa</a></div>' },
+      permiso: { label: 'Permiso de trabajo', content: '<div class="tag">Permiso</div><b>Permiso de trabajo en España</b><br><br>Para trabajar legalmente necesitas autorización de residencia y trabajo.<br><br>Si estás en situación irregular: puedes regularizarte mediante el <b>Arraigo Social</b> (3 años en España + vinculación laboral).<br><div class="card-links"><a class="card-link" href="https://extranjeros.inclusion.gob.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Portal Extranjeros (Ministerio)</a></div>' },
+      empadron: { label: 'Empadronamiento', content: '<div class="tag">Trámite</div><b>Padrón Municipal (Empadronamiento)</b><br><br>Acredita que vives en un municipio. Es la <b>prueba de domicilio</b> más importante.<br><br>Para qué sirve: sanidad, educación, servicios sociales, arraigo.<br>Cómo: ve al Ayuntamiento con pasaporte/NIE + contrato de alquiler.<br><b>Es gratuito</b> y no piden situación regular.' },
+      arraigo: { label: 'Arraigo social/laboral', content: '<div class="tag">Regularización</div><b>Arraigo — Regularización de situación irregular</b><br><br>Tipos:<br><ul><li><b>Social:</b> 3 años en España + contrato de trabajo o integración</li><li><b>Laboral:</b> 2 años + relación laboral demostrable</li><li><b>Familiar:</b> Ser padre/madre de un menor español</li></ul><br><div class="card-links"><a class="card-link" href="https://extranjeros.inclusion.gob.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Portal Extranjería</a></div>' },
+      costes: { label: 'Costes y tasas', content: '<div class="tag">Tasas</div><b>Costes oficiales (modelo 790)</b><br><ul><li>NIE: <b>~12€</b></li><li>TIE: <b>~16€</b></li><li>Permiso de trabajo: <b>~200–400€</b></li><li>Reagrupación: <b>~200€</b></li></ul><br><div class="card-links"><a class="card-link" href="https://sede.administracionespublicas.gob.es/pagotasas/index.htm" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>Pagar tasas online</a></div>' },
+      reagrupacion: { label: 'Reagrupación familiar', content: '<div class="tag">Familia</div><b>Reagrupación Familiar</b><br><br>Con residencia legal puedes traer a cónyuge, hijos menores de 18 y ascendientes a cargo.<br>Requisito: 1 año de residencia legal.<br><br><div class="card-links"><a class="card-link" href="https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/02-Autorización_de_residencia_por_reagrupación_familiar.pdf" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Descargar EX-02 (PDF)</a></div>' },
+      derechos: { label: 'Mis derechos', content: '<div class="tag">Derechos</div><b>Derechos aunque estés en situación irregular</b><br><ul><li>🏥 Urgencias gratuitas siempre</li><li>🏫 Educación de menores (obligatoria y gratuita)</li><li>⚖️ Asistencia jurídica gratuita</li><li>🤲 Servicios sociales básicos</li><li>🚫 No pueden detenerte solo por tu aspecto</li></ul><br><div class="card-links"><a class="card-link" href="https://www.acnur.org/es-es/" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>ACNUR — ONU Refugiados</a><a class="card-link" href="https://www.cruzroja.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>Cruz Roja</a></div>' }
+    }},
+    fr: { title: '📄 Documents et permis', intro: 'Documents principaux pour vivre en Espagne :', subs: {
+      nie: { label: 'Qu\'est-ce que le NIE ?', content: '<div class="tag">Document</div><b>NIE</b> — Numéro fiscal pour étrangers. Formulaire EX-15 · ~12€<br><div class="card-links"><a class="card-link" href="https://sede.administracionespublicas.gob.es/icpplus/index.html" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Prendre rendez-vous</a></div>' },
+      tie: { label: 'Carte de résidence (TIE)', content: '<div class="tag">Document</div><b>TIE</b> — Carte de résidence légale. EX-17 · ~16€' },
+      permiso: { label: 'Permis de travail', content: '<div class="tag">Permis</div>Pour travailler légalement, autorisation de résidence et travail requise. Régularisation possible par <b>Arraigo Social</b> (3 ans en Espagne).' },
+      empadron: { label: 'Certificat de domicile', content: '<div class="tag">Démarche</div>Le registre municipal prouve votre domicile. Gratuit à la mairie avec passeport + contrat de location.' },
+      arraigo: { label: 'Régularisation (Arraigo)', content: '<div class="tag">Régularisation</div>Social: 3 ans + contrat · Laboral: 2 ans + emploi prouvé' },
+      costes: { label: 'Coûts et taxes', content: '<div class="tag">Taxes</div>NIE: ~12€ · TIE: ~16€ · Permis de travail: ~200–400€' },
+      reagrupacion: { label: 'Regroupement familial', content: '<div class="tag">Famille</div>Avec résidence légale, vous pouvez faire venir votre famille. EX-02.' },
+      derechos: { label: 'Mes droits', content: '<div class="tag">Droits</div>Urgences gratuites · Éducation enfants · Aide juridique gratuite<br><div class="card-links"><a class="card-link" href="https://www.acnur.org" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>UNHCR Espagne</a></div>' }
+    }},
+    en: { title: '📄 Documents & permits', intro: 'Main documents to live in Spain:', subs: {
+      nie: { label: 'What is the NIE?', content: '<div class="tag">Document</div><b>NIE</b> — Foreigner identity number. Form EX-15 · ~€12<br><div class="card-links"><a class="card-link" href="https://sede.administracionespublicas.gob.es/icpplus/index.html" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Book appointment</a></div>' },
+      tie: { label: 'Residence card (TIE)', content: '<div class="tag">Document</div><b>TIE</b> — Legal residence card. Form EX-17 · ~€16' },
+      permiso: { label: 'Work permit', content: '<div class="tag">Permit</div>To work legally you need a residence and work authorisation. Regularise through Arraigo Social (3 years in Spain).' },
+      empadron: { label: 'Address registration', content: '<div class="tag">Process</div>Proves you live in a city. Free at city hall with passport + rental contract.' },
+      arraigo: { label: 'Regularisation', content: '<div class="tag">Regularisation</div>Social: 3 years + work contract · Labour: 2 years + provable employment' },
+      costes: { label: 'Costs & fees', content: '<div class="tag">Fees</div>NIE: ~€12 · TIE: ~€16 · Work permit: ~€200–400' },
+      reagrupacion: { label: 'Family reunification', content: '<div class="tag">Family</div>With legal residence, bring your family. Form EX-02.' },
+      derechos: { label: 'My rights', content: '<div class="tag">Rights</div>Free emergency care · Children education · Free legal aid<br><div class="card-links"><a class="card-link" href="https://www.acnur.org" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>UNHCR Spain</a></div>' }
+    }}
+  },
+  trabajo: {
+    es: { title: '💼 Trabajo y empleo', intro: 'Empleo y derechos laborales:', subs: {
+      buscar: { label: 'Buscar trabajo', content: '<div class="tag">Empleo</div><b>Buscar trabajo en España</b><br><ul><li>Registrarte en el SEPE como demandante</li><li>Portales: <a href="https://www.infojobs.net" target="_blank">InfoJobs</a>, <a href="https://www.indeed.es" target="_blank">Indeed</a>, LinkedIn</li></ul><br><div class="card-links"><a class="card-link" href="https://www.sepe.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>SEPE</a></div>' },
+      paro: { label: 'Prestación por desempleo', content: '<div class="tag">Paro</div><b>Paro</b> — Si cotizaste 12+ meses y te despidieron, puedes pedir el paro en 15 días hábiles.<br>Cuantía: 70% del salario los primeros 6 meses.<br><div class="card-links"><a class="card-link" href="https://www.sepe.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>SEPE prestaciones</a></div>' },
+      derechos_lab: { label: 'Derechos laborales', content: '<div class="tag">Derechos</div><b>Derechos laborales</b><br><ul><li>SMI: ~1.134€/mes (2024)</li><li>Máx. 40h/semana</li><li>30 días vacaciones/año</li><li>Contrato por escrito</li><li>Alta en Seguridad Social</li></ul><br><div class="card-links"><a class="card-link" href="https://www.mites.gob.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>Min. Trabajo</a></div>' }
+    }},
+    fr: { title: '💼 Travail et emploi', intro: 'Emploi en Espagne :', subs: {
+      buscar: { label: 'Chercher du travail', content: '<div class="tag">Emploi</div>Inscrivez-vous au SEPE. Portails : <a href="https://www.infojobs.net" target="_blank">InfoJobs</a>, <a href="https://www.indeed.es" target="_blank">Indeed</a>.' },
+      paro: { label: 'Allocation chômage', content: '<div class="tag">Chômage</div>12 mois cotisés minimum → 70% du salaire les 6 premiers mois.' },
+      derechos_lab: { label: 'Droits du travailleur', content: '<div class="tag">Droits</div>Salaire min: ~1.134€/mois · 40h max/semaine · 30 jours vacances/an' }
+    }},
+    en: { title: '💼 Work & employment', intro: 'Employment in Spain:', subs: {
+      buscar: { label: 'Find a job', content: '<div class="tag">Employment</div>Register at SEPE. Portals: <a href="https://www.infojobs.net" target="_blank">InfoJobs</a>, <a href="https://www.indeed.es" target="_blank">Indeed</a>.' },
+      paro: { label: 'Unemployment benefit', content: '<div class="tag">Benefits</div>12 months contributions → 70% of salary for 6 months.' },
+      derechos_lab: { label: 'Worker rights', content: '<div class="tag">Rights</div>Min wage: ~€1,134/month · Max 40h/week · 30 days holiday/year' }
+    }}
+  },
+  salud: {
+    es: { title: '🏥 Salud', intro: 'Sanidad en España:', subs: {
+      tsi: { label: 'Tarjeta sanitaria (TSI)', content: '<div class="tag">Sanidad</div><b>TSI — Tarjeta Sanitaria</b><br><br>Da acceso al médico de cabecera, especialistas y urgencias.<br>Necesitas estar empadronado. Ve al centro de salud con padrón y pasaporte.<br>Sin permiso de residencia igualmente puedes acceder a urgencias y, en muchas comunidades, a atención primaria.<br><div class="card-links"><a class="card-link" href="https://www.sanidad.gob.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>Min. Sanidad</a></div>' },
+      urgencias: { label: 'Urgencias y emergencias', content: '<div class="tag">Emergencias</div><b>Emergencias:</b><br><ul><li>🚨 <b>112</b> — Emergencias generales</li><li>🏥 <b>061</b> — Urgencias médicas</li></ul><br><b>Urgencias gratuitas para todos</b>, sin importar situación legal.' },
+      medico: { label: 'Pedir cita médica', content: '<div class="tag">Consulta</div>Llama a tu centro de salud, usa la app de salud de tu comunidad, o ve presencialmente. Puedes pedir intérprete gratuito.' }
+    }},
+    fr: { title: '🏥 Santé', intro: 'Santé en Espagne :', subs: {
+      tsi: { label: 'Carte sanitaire (TSI)', content: '<div class="tag">Santé</div>La TSI donne accès aux soins publics. Nécessite le registre municipal (empadronamiento).' },
+      urgencias: { label: 'Urgences', content: '<div class="tag">Urgences</div>🚨 <b>112</b> · 🏥 <b>061</b> — Urgences gratuites pour tous.' },
+      medico: { label: 'Prendre rendez-vous', content: '<div class="tag">Consultation</div>Appelez votre centre de santé. Interprète gratuit disponible.' }
+    }},
+    en: { title: '🏥 Health', intro: 'Health in Spain:', subs: {
+      tsi: { label: 'Health card (TSI)', content: '<div class="tag">Health</div>TSI gives access to public healthcare. Requires address registration.' },
+      urgencias: { label: 'Emergencies', content: '<div class="tag">Emergency</div>🚨 <b>112</b> · 🏥 <b>061</b> — Emergency care free for everyone.' },
+      medico: { label: 'Book a doctor', content: '<div class="tag">Consultation</div>Call your health centre or go in person. Free interpreter available.' }
+    }}
+  },
+  ayuda: {
+    es: { title: '🆘 Ayuda urgente', intro: 'Contactos y recursos de emergencia:', subs: {
+      tel: { label: 'Teléfonos de ayuda', content: '<div class="tag">Contacto</div><b>Teléfonos importantes:</b><br><ul><li>🚨 <b>112</b> — Emergencias</li><li>🏥 <b>061</b> — Urgencias médicas</li><li>👮 <b>091</b> — Policía Nacional</li><li>🤲 <b>900 10 02 25</b> — Atención al emigrante (gratis)</li><li>🏠 <b>900 42 00 32</b> — CEAR (refugiados, gratis)</li><li>📞 <b>016</b> — Violencia de género</li></ul>' },
+      refugio: { label: 'Refugio y asilo', content: '<div class="tag">Asilo</div><b>Solicitar asilo</b><br><br>Si huyes de persecución o guerra, tienes derecho a pedir asilo. Solicítalo en comisaría o Oficina de Asilo y Refugio (OAR).<br><div class="card-links"><a class="card-link" href="https://www.acnur.org/es-es/" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>ACNUR</a><a class="card-link" href="https://www.cear.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>CEAR</a></div>' },
+      violencia: { label: 'Violencia o amenazas', content: '<div class="tag">Seguridad</div><b>Si sufres violencia:</b><br><ul><li>📞 <b>016</b> — Violencia de género (gratis, confidencial)</li><li>🚨 <b>112</b> — Emergencias</li></ul><br>Aunque no tengas papeles, la policía tiene obligación de protegerte.' }
+    }},
+    fr: { title: '🆘 Aide urgente', intro: 'Contacts d\'urgence :', subs: {
+      tel: { label: 'Numéros utiles', content: '<div class="tag">Contact</div>🚨 <b>112</b> · 🏥 <b>061</b> · 🤲 <b>900 10 02 25</b> (aide immigrants, gratuit)' },
+      refugio: { label: 'Refuge et asile', content: '<div class="tag">Asile</div>Droit à l\'asile si vous fuyez la persécution ou la guerre.<br><div class="card-links"><a class="card-link" href="https://www.acnur.org" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>UNHCR</a></div>' },
+      violencia: { label: 'Violence ou menaces', content: '<div class="tag">Sécurité</div>📞 <b>016</b> — Violence de genre · 🚨 <b>112</b>. La police doit vous protéger.' }
+    }},
+    en: { title: '🆘 Urgent help', intro: 'Emergency contacts:', subs: {
+      tel: { label: 'Helplines', content: '<div class="tag">Contact</div>🚨 <b>112</b> · 🏥 <b>061</b> · 🤲 <b>900 10 02 25</b> (immigrants, free)' },
+      refugio: { label: 'Refuge & asylum', content: '<div class="tag">Asylum</div>Right to asylum if fleeing persecution or war.<br><div class="card-links"><a class="card-link" href="https://www.acnur.org" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>UNHCR Spain</a></div>' },
+      violencia: { label: 'Violence or threats', content: '<div class="tag">Safety</div>📞 <b>016</b> — Gender violence · 🚨 <b>112</b>. Police must protect you.' }
+    }}
+  }
+};
+const SUBTOPIC_MAP = {
+  es: {
+    costes: ['cuánto cuesta','cuanto cuesta','precio del nie','precio del tie','tasa','tasas','modelo 790'],
+    arraigo: ['arraigo social','arraigo laboral','arraigo familiar','regularizar','regularizarme','llevo 3 años','llevo 2 años','situación irregular','sin papeles'],
+    reagrupacion: ['reagrupación familiar','reagrupacion familiar','traer a mi familia','traer a mis hijos','reagrupar'],
+    derechos: ['qué derechos tengo','que derechos tengo','mis derechos','me pueden deportar','abogado gratis','ayuda jurídica','ayuda juridica'],
+    empadron: ['empadronamiento','empadronarme','padrón','padron','prueba de domicilio','certificado de domicilio','domicilio'],
+    nie: ['qué es el nie','que es el nie','solicitar nie','cómo sacar el nie','como sacar el nie','nie','ex-15','ex15'],
+    tie: ['tarjeta de residencia','renovar tie','tie','ex-17','ex17'],
+    permiso: ['permiso de trabajo','sin permiso','no tengo permiso','autorización de trabajo'],
+    tsi: ['tarjeta sanitaria','tsi','cómo obtener sanidad','medico de cabecera'],
+    urgencias: ['urgencias','112','emergencia','accidente','dolor fuerte'],
+    buscar: ['buscar trabajo','infojobs','linkedin','indeed','cv','no encuentro trabajo'],
+    paro: ['sepe','paro','me han despedido','perdí el trabajo','desempleo'],
+    derechos_lab: ['salario mínimo','derechos laborales','horas de trabajo','vacaciones','me explotan'],
+    tel: ['teléfonos','número de ayuda','ayuda urgente'],
+    refugio: ['asilo','refugio','refugiado','protección internacional','huyo de','guerra'],
+    violencia: ['violencia','me amenazan','me pegan','016']
+  },
+  fr: {
+    nie: ['nie','numéro d\'identité','ex-15'],
+    tie: ['tie','carte de résidence','ex-17'],
+    permiso: ['permis de travail','sans permis'],
+    empadron: ['registre municipal','preuve de domicile','certificat domicile'],
+    arraigo: ['arraigo','régularisation','situation irrégulière','sans papiers'],
+    costes: ['coût','tarif','taxe','modèle 790'],
+    reagrupacion: ['regroupement familial','amener ma famille'],
+    derechos: ['mes droits','aide juridique'],
+    tsi: ['carte sanitaire','tsi'],
+    urgencias: ['urgences','112','accident'],
+    buscar: ['chercher travail','emploi'],
+    paro: ['chômage','allocation chômage'],
+    derechos_lab: ['droits du travailleur','salaire minimum'],
+    tel: ['numéros utiles'],
+    refugio: ['asile','refuge','réfugié'],
+    violencia: ['violence','menaces','016']
+  },
+  en: {
+    nie: ['nie','identity number','ex-15'],
+    tie: ['tie','residence card','ex-17'],
+    permiso: ['work permit','without permit','undocumented worker'],
+    empadron: ['address registration','proof of address'],
+    arraigo: ['regularisation','irregular situation','undocumented'],
+    costes: ['cost','fee','price of nie'],
+    reagrupacion: ['family reunification','bring my family'],
+    derechos: ['my rights','free legal aid','deportation'],
+    tsi: ['health card','tsi','access healthcare'],
+    urgencias: ['emergency','112','accident'],
+    buscar: ['find job','job search','cv'],
+    paro: ['unemployment benefit','dismissed','lost job'],
+    derechos_lab: ['worker rights','minimum wage'],
+    tel: ['helplines','emergency number'],
+    refugio: ['asylum','refugee','international protection'],
+    violencia: ['violence','threats','016']
+  }
+};
+const KEYWORD_MAP = {
+  es: { papeles:['nie','tie','permiso','residencia','visa','pasaporte','documento','formulario','ex-','extranjería','extranjeria','papeles','regularizar'], trabajo:['trabajo','empleo','sepe','paro','desempleo','contrato','salario','sueldo','infojobs','empresa','despido'], salud:['médico','medico','hospital','urgencias','sanidad','salud','enfermedad','dolor','tsi','farmacia'], ayuda:['ayuda','emergencia','refugio','asilo','violencia','amenaza','cear','acnur','abogado'] },
+  fr: { papeles:['nie','tie','permis','résidence','visa','document','formulaire'], trabajo:['travail','emploi','sepe','chômage','contrat','salaire'], salud:['médecin','hôpital','urgences','santé','maladie','tsi'], ayuda:['aide','urgence','refuge','asile','violence','avocat'] },
+  en: { papeles:['nie','tie','permit','residence','visa','document','form','immigration'], trabajo:['work','job','employment','sepe','unemployment','contract','salary'], salud:['doctor','hospital','emergency','health','sick','tsi'], ayuda:['help','emergency','refuge','asylum','violence','lawyer'] }
+};
+const CITIES=[['madrid','Madrid'],['barcelona','Barcelona'],['valencia','Valencia'],['sevilla','Sevilla'],['zaragoza','Zaragoza'],['malaga','Málaga'],['murcia','Murcia'],['palma','Palma'],['bilbao','Bilbao'],['alicante','Alicante'],['cordoba','Córdoba'],['valladolid','Valladolid'],['vigo','Vigo'],['gijon','Gijón'],['vitoria','Vitoria'],['granada','Granada'],['oviedo','Oviedo'],['cartagena','Cartagena'],['jerez','Jerez'],['pamplona','Pamplona'],['almeria','Almería'],['burgos','Burgos'],['santander','Santander'],['salamanca','Salamanca'],['leon','León'],['tarragona','Tarragona'],['cadiz','Cádiz'],['jaen','Jaén'],['lugo','Lugo'],['barcelone','Barcelona'],['seville','Sevilla'],['saragosse','Zaragoza'],['grenade','Granada'],['cordoue','Córdoba'],['valence','Valencia']];
+const FORMS={'01':{name:'EX-01 — Estancia por estudios',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/01-Autorización_de_estancia_por_estudios_investigación_y_formación.pdf'},'02':{name:'EX-02 — Reagrupación familiar',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/02-Autorización_de_residencia_por_reagrupación_familiar.pdf'},'03':{name:'EX-03 — Residencia y trabajo',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/03-Autorización_de_residencia_y_trabajo_por_cuenta_ajena.pdf'},'04':{name:'EX-04 — Trabajo por cuenta propia',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/04-Autorización_de_residencia_y_trabajo_por_cuenta_propia.pdf'},'05':{name:'EX-05 — Residencia larga duración',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/05-Autorización_de_residencia_de_larga_duración.pdf'},'07':{name:'EX-07 — Modificación autorización',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/07-Modificación_de_autorización_de_residencia.pdf'},'09':{name:'EX-09 — Familiar ciudadano UE',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/09-Tarjeta_de_residencia_familiar_de_ciudadano_de_la_Unión_Europea.pdf'},'10':{name:'EX-10 — Prórroga de estancia',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/10-Prórroga_de_estancia.pdf'},'15':{name:'EX-15 — Solicitud de NIE',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/15-Formulario_NIE_y_certificados.pdf'},'17':{name:'EX-17 — Tarjeta TIE',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/17-Tarjeta_de_identidad_de_extranjero.pdf'},'18':{name:'EX-18 — Arraigo / circunstancias excepcionales',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/18-Autorización_de_residencia_temporal_por_razones_de_arraigo.pdf'},'20':{name:'EX-20 — Autorización de regreso',url:'https://extranjeros.inclusion.gob.es/ficheros/Modelos_solicitudes/mod_solicitudes2/20-Autorización_de_regreso.pdf'}};
+let lastCat=null;
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}
+function detectForm(input){const m=input.match(/ex[-\s]?(\d{1,2})/i);if(m)return m[1].padStart(2,'0');if(/formulario\s+(\d{1,2})/i.test(input))return input.match(/formulario\s+(\d{1,2})/i)[1].padStart(2,'0');return null;}
+function detectCity(input){const n=norm(input);for(const[key,city]of CITIES){if(n.includes(norm(key)))return city;}return null;}
+function detectPlaceType(input){const n=norm(input);if(/extranje|inmigraci|extranjer|foreigner|immigration|bureau des etr/.test(n))return 'oficina de extranjería';if(/sepe|desempleo|paro|chomage|unemployment/.test(n))return 'oficina SEPE';if(/ayuntamiento|mairie|town hall/.test(n))return 'ayuntamiento';if(/policia|police|commissariat/.test(n))return 'comisaría policía';if(/hospital|clinic/.test(n))return 'hospital';return null;}
+function respond(raw){const input=raw.trim();const n=norm(input);const L=currentLang;const ui=UI[L];const formNum=detectForm(n);if(formNum&&FORMS[formNum]){const f=FORMS[formNum];return `📄 <b>${f.name}</b><div class="card-links"><a class="card-link" href="${f.url}" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Descargar formulario oficial (PDF)</a></div>`;}
+const city=detectCity(n);const placeType=detectPlaceType(n);if(city&&placeType){const q=encodeURIComponent(`${placeType} ${city}`);return `📍 <b>${placeType} en ${city}</b><div class="card-links"><a class="card-link" href="https://www.google.com/maps/search/${q}" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Google Maps</a><a class="card-link" href="https://www.google.com/search?q=${q}" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>Buscar en Google</a><a class="card-link" href="https://sede.administracionespublicas.gob.es/icpplus/index.html" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Cita previa</a></div>`;}
+const stMap=SUBTOPIC_MAP[L]||SUBTOPIC_MAP.es;for(const[subKey,keywords]of Object.entries(stMap)){for(const kw of keywords){if(n.includes(norm(kw))){for(const[catKey,catData]of Object.entries(DB)){const catLang=catData[L]||catData.es;if(catLang.subs&&catLang.subs[subKey]){lastCat=catKey;return catLang.subs[subKey].content;}}}}}
+const kmMap=KEYWORD_MAP[L]||KEYWORD_MAP.es;for(const[catKey,keywords]of Object.entries(kmMap)){for(const kw of keywords){if(n.includes(norm(kw))){lastCat=catKey;return showCategory(catKey);}}}
+return buildUnknown(input);}
+function showCategory(catKey){const L=currentLang;const catLang=DB[catKey]?.[L]||DB[catKey]?.es;if(!catLang)return buildUnknown('');lastCat=catKey;const subsHtml=Object.entries(catLang.subs).map(([k,s])=>`<button class="qbtn" onclick="subTopic('${catKey}','${k}')">${s.label}</button>`).join('');return `<b>${catLang.title}</b><br>${catLang.intro}<div class="quick-btns" style="margin-top:10px">${subsHtml}</div>`;}
+function buildUnknown(input){const L=currentLang;const ui=UI[L];const q=encodeURIComponent(input+' inmigración España');return `${ui.unknownPrefix}<div class="card-links"><a class="card-link" href="https://www.google.com/search?q=${q}" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>${ui.unknownGoogle}</a><a class="card-link" href="https://extranjeros.inclusion.gob.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>${ui.unknownIntranet}</a><a class="card-link" href="https://sede.administracionespublicas.gob.es" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>${ui.unknownPAGES}</a></div><br><small>${ui.unknownAskMore}</small>`;}
+function addMsg(role,html,withQuickBtns){const wrap=document.getElementById('messages');const typing=document.getElementById('typing');const div=document.createElement('div');div.className=`msg ${role}`;const bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML=html;div.appendChild(bubble);wrap.insertBefore(div,typing);if(withQuickBtns&&role==='bot'){const qd=document.createElement('div');qd.className='quick-btns';UI[currentLang].categories.forEach((label,i)=>{const btn=document.createElement('button');btn.className='qbtn cat';btn.textContent=label;btn.onclick=()=>catClick(UI[currentLang].catIds[i]);qd.appendChild(btn);});div.appendChild(qd);}setTimeout(()=>wrap.scrollTop=wrap.scrollHeight,50);}
+function showTyping(){document.getElementById('typing').classList.add('show');const wrap=document.getElementById('messages');setTimeout(()=>wrap.scrollTop=wrap.scrollHeight,50);}
+function hideTyping(){document.getElementById('typing').classList.remove('show');}
+function catClick(catKey){const L=currentLang;const catLang=DB[catKey]?.[L]||DB[catKey]?.es;if(!catLang)return;addMsg('user',catLang.title);showTyping();setTimeout(()=>{hideTyping();addMsg('bot',showCategory(catKey));},500);}
+function subTopic(catKey,subKey){const L=currentLang;const catLang=DB[catKey]?.[L]||DB[catKey]?.es;if(!catLang?.subs?.[subKey])return;const sub=catLang.subs[subKey];addMsg('user',sub.label);showTyping();setTimeout(()=>{hideTyping();addMsg('bot',sub.content);},500);}
+async function sendMsg(){const box=document.getElementById('inputBox');const text=box.value.trim();if(!text)return;box.value='';box.style.height='';addMsg('user',escapeHtml(text));showTyping();await new Promise(r=>setTimeout(r,600+Math.random()*400));hideTyping();addMsg('bot',respond(text));}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+document.getElementById('inputBox').addEventListener('input',function(){this.style.height='';this.style.height=Math.min(this.scrollHeight,140)+'px';});
+document.getElementById('inputBox').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+function toggleTheme(){const isDark=document.documentElement.getAttribute('data-theme')!=='light';const newTheme=isDark?'light':'dark';document.documentElement.setAttribute('data-theme',newTheme==='dark'?'':'light');localStorage.setItem('theme',newTheme);document.getElementById('themeBtn').textContent=newTheme==='light'?'🌙':'☀️';}
+(function(){const saved=localStorage.getItem('theme');if(saved==='light'){document.documentElement.setAttribute('data-theme','light');document.getElementById('themeBtn').textContent='☀️';}})();
+function setLang(lang){currentLang=lang;localStorage.setItem('lang',lang);document.querySelectorAll('.lang-btn').forEach(b=>{b.classList.toggle('active',b.dataset.lang===lang);});const ui=UI[lang];document.getElementById('subtitle').textContent=ui.subtitle;document.getElementById('inputBox').placeholder=ui.placeholder;document.getElementById('infoFooter').textContent=ui.footer;const wrap=document.getElementById('messages');const typing=document.getElementById('typing');while(wrap.firstChild&&wrap.firstChild!==typing){wrap.removeChild(wrap.firstChild);}lastCat=null;showWelcome();}
+function showWelcome(){const ui=UI[currentLang];addMsg('bot',ui.welcome,true);}
+let recognition=null,listening=false;
+function toggleVoice(){if(!('webkitSpeechRecognition'in window||'SpeechRecognition'in window)){alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome.');return;}if(listening){recognition.stop();return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.lang=currentLang==='fr'?'fr-ES':currentLang==='en'?'en-US':'es-ES';recognition.onresult=e=>{document.getElementById('inputBox').value=e.results[0][0].transcript;};recognition.onend=()=>{listening=false;document.getElementById('micBtn').classList.remove('listening');};recognition.start();listening=true;document.getElementById('micBtn').classList.add('listening');}
+document.addEventListener('DOMContentLoaded',()=>{const savedLang=localStorage.getItem('lang')||'es';setLang(savedLang);});
+</script>
+</body>
+</html>
